@@ -17,7 +17,7 @@ but WITHOUT ANY WARRANTY.
 #include "GameObject.h"
 
 Renderer *g_Renderer = NULL;
-GameObject go(100.0f, 100.0f, 100.0f, 10.0f);
+GameObject go(0.0f, 0.0f, 0.0f, 10.0f);
 
 void RenderScene(void)
 {
@@ -26,6 +26,8 @@ void RenderScene(void)
 
 	// Renderer Test
 	g_Renderer->DrawSolidRect(go.GetX(), go.GetY(), go.GetZ(), go.GetSize(), 1, 0, 1, 1);
+
+	go.Update();
 
 	glutSwapBuffers();
 }

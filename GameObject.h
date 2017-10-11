@@ -6,6 +6,7 @@ class GameObject
 {
 private:
 	float x, y, z, size;
+	float vx, vy, speed = 1;
 
 public:
 	GameObject() {}
@@ -16,6 +17,8 @@ public:
 	float GetY() { return y; }
 	float GetZ() { return z; }
 	float GetSize() { return size; }
+
+	void Update();
 };
 
 class Player : public GameObject
