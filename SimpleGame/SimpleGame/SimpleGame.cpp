@@ -14,8 +14,10 @@ but WITHOUT ANY WARRANTY.
 #include "Dependencies\freeglut.h"
 
 #include "Renderer.h"
+#include "GameObject.h"
 
 Renderer *g_Renderer = NULL;
+GameObject* go = new GameObject(0.0f, 0.0f, 10.0f);
 
 void RenderScene(void)
 {
@@ -23,7 +25,9 @@ void RenderScene(void)
 	glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
 
 	// Renderer Test
-	g_Renderer->DrawSolidRect(0, 0, 0, 4, 1, 0, 1, 1);
+	g_Renderer->DrawSolidRect(go->GetX(), go->GetY(), 0, go->GetSize(), 1, 1, 1, 1);
+
+	go->Update();
 
 	glutSwapBuffers();
 }
