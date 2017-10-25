@@ -10,24 +10,31 @@ but WITHOUT ANY WARRANTY.
 
 #include "stdafx.h"
 #include <iostream>
+#include "windows.h"
 #include "Dependencies\glew.h"
 #include "Dependencies\freeglut.h"
 
 #include "Renderer.h"
 #include "GameObject.h"
+#include "SceneMgr.h"
 
-Renderer *g_Renderer = NULL;
-GameObject* go = new GameObject(0.0f, 0.0f, 10.0f);
+SceneMgr *g_SceneMgr = NULL;
+
+DWORD g_prevTime = 0; 
+
+bool g_LButtonDown = false;
 
 void RenderScene(void)
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-	// Renderer Test
-	g_Renderer->DrawSolidRect(go->GetX(), go->GetY(), 0, go->GetSize(), 1, 1, 1, 1);
+	DWORD currentTime = timeGetTime();
+	DWORD elapsedTime = currentTime - g_prevTime;
+	g_prevTime = currentTime;
 
-	go->Update();
+	g_SceneMgr->UpdateObj((float)elapsedTime);
+	g_SceneMgr->DrawObj();
 
 	glutSwapBuffers();
 }
@@ -39,6 +46,35 @@ void Idle(void)
 
 void MouseInput(int button, int state, int x, int y)
 {
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+	{
+		g_LButtonDown = true;
+	}
+
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_UP)
+	{
+		if (g_LButtonDown)
+		{
+			//clicked
+			for (int i = 0; i < 100; i++)
+				g_SceneMgr->AddObj(x - 250, -y + 250);
+		}
+		g_LButtonDown = false;
+	}
+
+	RenderScene();
+}
+
+void MotionInput(int x, int y)
+{
+	if (g_LButtonDown)
+	{
+		//clicked
+		for (int i = 0; i < 100; i++)
+		{
+			//g_SceneMgr->AddActorObject(x - 250, -y + 250);
+		}
+	}
 	RenderScene();
 }
 
@@ -71,22 +107,26 @@ int main(int argc, char **argv)
 		std::cout << "GLEW 3.0 not supported\n ";
 	}
 
-	// Initialize Renderer
-	g_Renderer = new Renderer(500, 500);
-	if (!g_Renderer->IsInitialized())
-	{
-		std::cout << "Renderer could not be initialized.. \n";
-	}
-
 	glutDisplayFunc(RenderScene);
 	glutIdleFunc(Idle);
 	glutKeyboardFunc(KeyInput);
 	glutMouseFunc(MouseInput);
 	glutSpecialFunc(SpecialKeyInput);
 
+	g_SceneMgr = new SceneMgr(500, 500);
+	for (int i = 0; i < 200; i++)
+	{
+		float x = 250.f * 2.f * ((float)std::rand() / (float)RAND_MAX - 0.5f);
+		float y = 250.f * 2.f * ((float)std::rand() / (float)RAND_MAX - 0.5f);
+
+		g_SceneMgr->AddObj(x, y);
+	}
+
+	g_prevTime = timeGetTime();
+
 	glutMainLoop();
 
-	delete g_Renderer;
+	delete g_SceneMgr;
 
     return 0;
 }
