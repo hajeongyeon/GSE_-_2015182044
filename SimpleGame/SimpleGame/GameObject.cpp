@@ -14,7 +14,6 @@ GameObject::GameObject(float x1, float y1)
 	for (int i = 0; i < 4; ++i)
 		color[i] = 1;
 
-	life = 100.f;
 	LifeTime = 100000.f;
 }
 
@@ -30,8 +29,8 @@ void GameObject::Update(float ElapsedTime)
 	if (y > 250 || y < -250)
 		vy = -vy;
 
-	if (life > 0.f)
-		life -= 0.5f;
-	if (LifeTime > 0.f)
-		LifeTime -= ElapsedTimeInSecond;
+	//if (life > 0.f)
+	//	life -= 0.5f;
+	//if (LifeTime > 0.f)
+	//	LifeTime -= ElapsedTimeInSecond;
 }

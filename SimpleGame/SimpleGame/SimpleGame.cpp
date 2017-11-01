@@ -56,8 +56,8 @@ void MouseInput(int button, int state, int x, int y)
 		if (g_LButtonDown)
 		{
 			//clicked
-			for (int i = 0; i < 100; i++)
-				g_SceneMgr->AddObj(x - 250, -y + 250);
+			// for (int i = 0; i < 100; i++)
+				g_SceneMgr->AddObj(x - 250, -y + 250, OBJECT_CHARACTER);
 		}
 		g_LButtonDown = false;
 	}
@@ -72,7 +72,7 @@ void MotionInput(int x, int y)
 		//clicked
 		for (int i = 0; i < 100; i++)
 		{
-			//g_SceneMgr->AddActorObject(x - 250, -y + 250);
+			//g_SceneMgr->AddObj(x - 250, -y + 250);
 		}
 	}
 	RenderScene();
@@ -119,7 +119,9 @@ int main(int argc, char **argv)
 		float x = 250.f * 2.f * ((float)std::rand() / (float)RAND_MAX - 0.5f);
 		float y = 250.f * 2.f * ((float)std::rand() / (float)RAND_MAX - 0.5f);
 
-		g_SceneMgr->AddObj(x, y);
+		g_SceneMgr->AddObj(0, 0, OBJECT_BUILDING);
+		g_SceneMgr->AddObj(x, y, OBJECT_CHARACTER);
+		g_SceneMgr->AddObj(0, 0, OBJECT_BULLET);
 	}
 
 	g_prevTime = timeGetTime();

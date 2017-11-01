@@ -2,17 +2,18 @@
 
 #include <iostream>
 
-#define MAX_OBJ_COUNT 10
+#define MAX_OBJ_COUNT 100
 
 class GameObject
 {
 private:
 	float x, y, size;
 	float vx, vy;
-	float life, LifeTime;
+	float LifeTime;
 
 public:
 	float color[4];
+	float life;
 
 	GameObject(float x1, float y1);
 	~GameObject() {}
@@ -21,6 +22,6 @@ public:
 	float getY() { return y; }
 	float getSize() { return size; }
 	void Update(float ElapsedTime);
-	float getLife() { return life; }
+	void SetLife(float slife) { life = slife; }
 	float getLifeTime() { return LifeTime; }
 };

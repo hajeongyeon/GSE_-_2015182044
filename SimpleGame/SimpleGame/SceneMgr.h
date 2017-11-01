@@ -3,6 +3,11 @@
 #include "GameObject.h"
 #include "Renderer.h"
 
+#define OBJECT_BUILDING 1
+#define OBJECT_CHARACTER 2
+#define OBJECT_BULLET 3
+#define OBJECT_ARROW 4
+
 class SceneMgr
 {
 public:
@@ -11,6 +16,7 @@ public:
 
 	GameObject* m_obj[MAX_OBJ_COUNT];
 	GameObject* bulletObj[MAX_OBJ_COUNT];
+	GameObject* buildingObj;
 	Renderer* renderer;
 
 public:
@@ -18,7 +24,7 @@ public:
 	~SceneMgr() {}
 
 	void DrawObj();
-	int AddObj(float x, float y);
+	int AddObj(float x, float y, int obj);
 	void DeleteObj(int idx);
 	GameObject* GetObj(int n) const { return m_obj[n]; }
 	void UpdateObj(float ElapsedTime);
