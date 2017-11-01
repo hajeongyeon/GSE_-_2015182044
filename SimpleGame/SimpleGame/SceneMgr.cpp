@@ -87,6 +87,15 @@ void SceneMgr::DeleteObj(int idx)
 	}
 }
 
+void SceneMgr::DeleteBLObj(int idx)
+{
+	if (bulletObj[idx] != NULL)
+	{
+		delete bulletObj[idx];
+		bulletObj[idx] = NULL;
+	}
+}
+
 void SceneMgr::UpdateObj(float ElapsedTime)
 {
 	DoCollision();
@@ -124,36 +133,36 @@ void SceneMgr::DoCollision()
 
 		if (m_obj[i] != NULL)
 		{
-			for (int j = 0; j < MAX_OBJ_COUNT; j++)
+			float minX, minY;
+			float maxX, maxY;
+
+			float minX1, minY1;
+			float maxX1, maxY1;
+
+			float minX2, minY2;
+			float maxX2, maxY2;
+
+			minX = m_obj[i]->getX() - m_obj[i]->getSize() / 2.f;
+			minY = m_obj[i]->getY() - m_obj[i]->getSize() / 2.f;
+			maxX = m_obj[i]->getX() + m_obj[i]->getSize() / 2.f;
+			maxY = m_obj[i]->getY() + m_obj[i]->getSize() / 2.f;
+			minX1 = buildingObj->getX() - 10;
+			minY1 = buildingObj->getY() - 10;
+			maxX1 = buildingObj->getX() + 10;
+			maxY1 = buildingObj->getY() + 10;
+			minX2 = bulletObj[i]->getX() - 2.5f;
+			minY2 = bulletObj[i]->getY() - 2.5f;
+			maxX2 = bulletObj[i]->getX() + 2.5f;
+			maxY2 = bulletObj[i]->getY() + 2.5f;
+			if (CollisionRect(minX, minY, maxX, maxY, minX1, minY1, maxX1, maxY1))
 			{
-				if (i == j)
-					continue;
-
-				if (m_obj[j] != NULL)
-				{
-					float minX, minY;
-					float maxX, maxY;
-
-					float minX1, minY1;
-					float maxX1, maxY1;
-
-					float minX2, minY2;
-					float maxX2, maxY2;
-
-					minX = m_obj[i]->getX() - m_obj[i]->getSize() / 2.f;
-					minY = m_obj[i]->getY() - m_obj[i]->getSize() / 2.f;
-					maxX = m_obj[i]->getX() + m_obj[i]->getSize() / 2.f;
-					maxY = m_obj[i]->getY() + m_obj[i]->getSize() / 2.f;
-					minX1 = buildingObj->getX() - 10;
-					minY1 = buildingObj->getY() - 10;
-					maxX1 = buildingObj->getX() + 10;
-					maxY1 = buildingObj->getY() + 10;
-					if (CollisionRect(minX, minY, maxX, maxY, minX1, minY1, maxX1, maxY1))
-					{
-						collisionBDCount++;
-					}
-				}
+				collisionBDCount++;
 			}
+			if (CollisionRect(minX, minY, maxX, maxY, minX2, minY2, maxX2, maxY2))
+			{
+				collisionBLCount++;
+			}
+
 			if (collisionBDCount > 0)
 			{
 				DeleteObj(i);
@@ -162,6 +171,14 @@ void SceneMgr::DoCollision()
 
 				if (buildingObj->life < 0.f)
 					delete buildingObj;
+			}
+			if (collisionBLCount > 0) {
+				// DeleteBLObj(i);
+
+				m_obj[i]->life -= bulletObj[i]->life;
+
+				if (m_obj[i]->life < 0.f)
+					DeleteObj(i);
 			}
 		}
 	}

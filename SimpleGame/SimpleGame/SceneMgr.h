@@ -26,6 +26,7 @@ public:
 	void DrawObj();
 	int AddObj(float x, float y, int obj);
 	void DeleteObj(int idx);
+	void DeleteBLObj(int idx);
 	GameObject* GetObj(int n) const { return m_obj[n]; }
 	void UpdateObj(float ElapsedTime);
 
