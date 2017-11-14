@@ -1,35 +1,31 @@
 #pragma once
 
+#include <iostream>
 #include "GameObject.h"
 #include "Renderer.h"
 
-#define OBJECT_BUILDING 1
-#define OBJECT_CHARACTER 2
-#define OBJECT_BULLET 3
-#define OBJECT_ARROW 4
-
 class SceneMgr
 {
-public:
-	int WindowWidth;
-	int WindowHeight;
-
-	GameObject* m_obj[MAX_OBJ_COUNT];
-	GameObject* bulletObj[MAX_OBJ_COUNT];
-	GameObject* buildingObj;
+private:
 	Renderer* renderer;
 
+	GameObject* buildingObj;
+	GameObject* actorObj[MAX_OBJ_COUNT];
+	GameObject* bulletObj[MAX_BL_COUNT];
+
+	GLuint textureBuilding;
+
 public:
-	SceneMgr(int width, int height);
-	~SceneMgr() {}
+	SceneMgr();
+	~SceneMgr();
 
-	void DrawObj();
-	int AddObj(float x, float y, int obj);
+	void DrawSolidRect();
+
+	int AddObj(float x, float y, int type);
+	void UpdateObj(float elapsedTime);
 	void DeleteObj(int idx);
-	void DeleteBLObj(int idx);
-	GameObject* GetObj(int n) const { return m_obj[n]; }
-	void UpdateObj(float ElapsedTime);
 
-	void DoCollision();
+	void Collision();
 	bool CollisionRect(float minX, float minY, float maxX, float maxY, float minX1, float minY1, float maxX1, float maxY1);
 };
+

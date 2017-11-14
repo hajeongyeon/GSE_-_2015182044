@@ -1,184 +1,224 @@
 #include "stdafx.h"
 #include "SceneMgr.h"
-#include <time.h>
-#include <Windows.h>
 
-SceneMgr::SceneMgr(int width, int height)
+SceneMgr::SceneMgr()
 {
-	renderer = new Renderer(width, height);
+	renderer = new Renderer(500, 500);
 
-	if(renderer->IsInitialized())
-		std::cout << "SceneMgr::Renderer could not be initialized.. \n";
-
-	WindowWidth = width;
-	WindowHeight = height;
+	if (!renderer->IsInitialized())
+		std::cout << "Renderer could not be initialized.. \n";
 
 	for (int i = 0; i < MAX_OBJ_COUNT; ++i)
-		m_obj[i] = NULL;
+		actorObj[i] = NULL;
+
+	for (int i = 0; i < MAX_BL_COUNT; ++i)
+		bulletObj[i] = NULL;
+
+	textureBuilding = renderer->CreatePngTexture("./Resource/building.png");
 }
 
-void SceneMgr::DrawObj()
+SceneMgr::~SceneMgr()
 {
-	renderer->DrawSolidRect(0, 0, 0, WindowWidth, 0, 0, 0, 0.4);
+	if (buildingObj != NULL)
+		delete buildingObj;
 
-	renderer->DrawSolidRect(buildingObj->getX(), buildingObj->getY(), 0, 30, 1, 1, 0, 0);
+	for (int i = 0; i < MAX_BL_COUNT; ++i)
+		if (bulletObj[i] != NULL)
+			delete bulletObj[i];
 
-	for (int i = 0; i < MAX_OBJ_COUNT; i++)
-	{
-		if (m_obj[i] != NULL)
-		{
-			// Renderer Test
-			renderer->DrawSolidRect(
-				m_obj[i]->getX(),
-				m_obj[i]->getY(),
-				0,
-				m_obj[i]->getSize(),
-				m_obj[i]->color[0],
-				m_obj[i]->color[1],
-				m_obj[i]->color[2],
-				m_obj[i]->color[3]
-			);
-		}
-	}
+	for (int i = 0; i < MAX_OBJ_COUNT; ++i)
+		if (actorObj[i] != NULL)
+			delete actorObj[i];
 
-	for (int i = 0; i < MAX_OBJ_COUNT; ++i) {
-		if (bulletObj[i] != NULL) {
-			renderer->DrawSolidRect(bulletObj[i]->getX(), bulletObj[i]->getY(), 0, 5, 0, 1, 0, 0);
-		}
-	}
+	delete renderer;
+	delete[] bulletObj;
+	delete[] actorObj;
 }
 
-int SceneMgr::AddObj(float x, float y, int obj)
+void SceneMgr::DrawSolidRect()
 {
-	if (obj == OBJECT_CHARACTER) {
-		for (int i = 0; i < MAX_OBJ_COUNT; ++i) {
-			if (m_obj[i] == NULL) {
-				m_obj[i] = new GameObject(x, y);
-				m_obj[i]->SetLife(100.f);
-				return i;
-			}
-		}
+	if (buildingObj != NULL)
+		renderer->DrawTexturedRect(buildingObj->getX(), buildingObj->getY(), 0,
+			buildingObj->getSize(), buildingObj->color[0], buildingObj->color[1], buildingObj->color[2], buildingObj->color[3], textureBuilding);
+
+	for (int i = 0; i < MAX_OBJ_COUNT; ++i)
+		if (actorObj[i] != NULL)
+			renderer->DrawSolidRect(actorObj[i]->getX(), actorObj[i]->getY(), 0,
+				actorObj[i]->getSize(), actorObj[i]->color[0], actorObj[i]->color[1], actorObj[i]->color[2], actorObj[i]->color[3]);
+
+	for(int i =0; i< MAX_BL_COUNT; ++i)
+		if (bulletObj[i] != NULL)
+			renderer->DrawSolidRect(bulletObj[i]->getX(), bulletObj[i]->getY(), 0,
+				bulletObj[i]->getSize(), bulletObj[i]->color[0], bulletObj[i]->color[1], bulletObj[i]->color[2], bulletObj[i]->color[3]);
+}
+
+
+int SceneMgr::AddObj(float x, float y, int type)
+{
+	if (type == OBJECT_BUILDING) {
+		buildingObj = new GameObject(x, y, type);
 	}
-	else if (obj == OBJECT_BUILDING) {
-		buildingObj = new GameObject(x, y);
-		buildingObj->SetLife(100.f);
-		return 0;
-	}
-	else if (obj == OBJECT_BULLET) {
-		for (int i = 0; i < MAX_OBJ_COUNT; ++i) {
+	else if (type == OBJECT_BULLET) {
+		for (int i = 0; i < MAX_BL_COUNT; i++) {
 			if (bulletObj[i] == NULL) {
-				bulletObj[i] = new GameObject(x, y);
-				bulletObj[i]->SetLife(20.f);
+				bulletObj[i] = new GameObject(x, y, type);
 				return i;
 			}
 		}
 	}
-
-	std::cout << "slots are full \n";
-	return -1;
-}
-
-void SceneMgr::DeleteObj(int idx)
-{
-	if (m_obj[idx] != NULL)
-	{
-		delete m_obj[idx];
-		m_obj[idx] = NULL;
+	else {
+		for (int i = 0; i < MAX_OBJ_COUNT; i++) {
+			if (actorObj[i] == NULL) {
+				actorObj[i] = new GameObject(x, y, type);
+				return i;
+			}
+		}
 	}
 }
 
-void SceneMgr::DeleteBLObj(int idx)
+void SceneMgr::UpdateObj(float elapsedTime)
 {
-	if (bulletObj[idx] != NULL)
-	{
-		delete bulletObj[idx];
-		bulletObj[idx] = NULL;
+	Collision();
+
+	if (buildingObj != NULL) {
+		if (buildingObj->getLife() < 0.0001f) {
+			delete buildingObj;
+			buildingObj = NULL;
+		}
+		else {
+			buildingObj->Update(elapsedTime);
+
+			if (buildingObj->getBulletTime() > 0.5f) {
+				AddObj(buildingObj->getX(), buildingObj->getY(), OBJECT_BULLET);
+				buildingObj->SetBulletTime(0.f);
+			}
+		}
 	}
-}
 
-void SceneMgr::UpdateObj(float ElapsedTime)
-{
-	DoCollision();
-
-	for (int i = 0; i < MAX_OBJ_COUNT; i++)
-	{
-		if (m_obj[i] != NULL)
-		{
-			if (m_obj[i]->life < 0.0001f || m_obj[i]->getLifeTime() < 0.0001f)
-			{
-				//kill object
-				delete m_obj[i];
-				m_obj[i] = NULL;
+	for (int i = 0; i < MAX_BL_COUNT; ++i) {
+		if (bulletObj[i] != NULL) {
+			if (bulletObj[i]->getLife() < 0.0001f) {
+				delete bulletObj[i];
+				bulletObj[i] = NULL;
 			}
 			else
-			{
-				m_obj[i]->Update(ElapsedTime);
-			}
+				bulletObj[i]->Update(elapsedTime);
 		}
-		if (bulletObj[i] != NULL)
-		{
-			bulletObj[i]->Update(ElapsedTime);
+	}
+
+	for (int i = 0; i < MAX_OBJ_COUNT; i++) {
+		if (actorObj[i] != NULL) {
+			if (actorObj[i]->getLife() <= 0.f) {
+				DeleteObj(i);
+			}
+			else {
+				actorObj[i]->Update(elapsedTime);
+
+				if (actorObj[i]->getType() == OBJECT_CHARACTER) {
+					if (actorObj[i]->getArrowTime() > 0.5f) {
+						AddObj(actorObj[i]->getX(), actorObj[i]->getY(), OBJECT_ARROW);
+						actorObj[i]->SetArrowTime(0.f);
+					}
+				}
+			}
 		}
 	}
 }
 
-void SceneMgr::DoCollision()
+void SceneMgr::DeleteObj(int index)
 {
-	int collisionBDCount = 0;		// ºôµù°ú Ãæµ¹
-	int collisionBLCount = 0;		// ÃÑ¾Ë°ú Ãæµ¹
-
-	for (int i = 0; i < MAX_OBJ_COUNT; i++)
+	if (actorObj[index] != NULL)
 	{
-		collisionBDCount = 0;
+		delete actorObj[index];
+		actorObj[index] = NULL;
+	}
+}
 
-		if (m_obj[i] != NULL)
-		{
-			float minX, minY;
-			float maxX, maxY;
+void SceneMgr::Collision()
+{
+	// building and (character, arrow) collision
+	if (buildingObj != NULL) {
+		for (int i = 0; i < MAX_OBJ_COUNT; i++) {
+			if (actorObj[i] != NULL) {
+				float minX, minY;
+				float maxX, maxY;
+				float minX1, minY1;
+				float maxX1, maxY1;
 
-			float minX1, minY1;
-			float maxX1, maxY1;
+				minX = actorObj[i]->getX() - actorObj[i]->getSize() / 2.f;
+				minY = actorObj[i]->getY() - actorObj[i]->getSize() / 2.f;
+				maxX = actorObj[i]->getX() + actorObj[i]->getSize() / 2.f;
+				maxY = actorObj[i]->getY() + actorObj[i]->getSize() / 2.f;
+				minX1 = buildingObj->getX() - buildingObj->getSize() / 2.f;
+				minY1 = buildingObj->getY() - buildingObj->getSize() / 2.f;
+				maxX1 = buildingObj->getX() + buildingObj->getSize() / 2.f;
+				maxY1 = buildingObj->getY() + buildingObj->getSize() / 2.f;
 
-			float minX2, minY2;
-			float maxX2, maxY2;
-
-			minX = m_obj[i]->getX() - m_obj[i]->getSize() / 2.f;
-			minY = m_obj[i]->getY() - m_obj[i]->getSize() / 2.f;
-			maxX = m_obj[i]->getX() + m_obj[i]->getSize() / 2.f;
-			maxY = m_obj[i]->getY() + m_obj[i]->getSize() / 2.f;
-			minX1 = buildingObj->getX() - 10;
-			minY1 = buildingObj->getY() - 10;
-			maxX1 = buildingObj->getX() + 10;
-			maxY1 = buildingObj->getY() + 10;
-			minX2 = bulletObj[i]->getX() - 2.5f;
-			minY2 = bulletObj[i]->getY() - 2.5f;
-			maxX2 = bulletObj[i]->getX() + 2.5f;
-			maxY2 = bulletObj[i]->getY() + 2.5f;
-			if (CollisionRect(minX, minY, maxX, maxY, minX1, minY1, maxX1, maxY1))
-			{
-				collisionBDCount++;
+				if (CollisionRect(minX, minY, maxX, maxY, minX1, minY1, maxX1, maxY1)) {
+					buildingObj->SetDamage(actorObj[i]->getLife());
+					actorObj[i]->SetLife(0.f);
+				}
 			}
-			if (CollisionRect(minX, minY, maxX, maxY, minX2, minY2, maxX2, maxY2))
-			{
-				collisionBLCount++;
+		}
+	}
+
+	// character and bullet
+	for (int i = 0; i < MAX_OBJ_COUNT; i++) {
+		if (actorObj[i] != NULL) {
+			for (int j = 0; j < MAX_BL_COUNT; j++) {
+				if (bulletObj[j] != NULL) {
+					float minX, minY;
+					float maxX, maxY;
+					float minX1, minY1;
+					float maxX1, maxY1;
+
+					minX = actorObj[i]->getX() - actorObj[i]->getSize() / 2.f;
+					minY = actorObj[i]->getY() - actorObj[i]->getSize() / 2.f;
+					maxX = actorObj[i]->getX() + actorObj[i]->getSize() / 2.f;
+					maxY = actorObj[i]->getY() + actorObj[i]->getSize() / 2.f;
+					minX1 = bulletObj[j]->getX() - bulletObj[j]->getSize() / 2.f;
+					minY1 = bulletObj[j]->getY() - bulletObj[j]->getSize() / 2.f;
+					maxX1 = bulletObj[j]->getX() + bulletObj[j]->getSize() / 2.f;
+					maxY1 = bulletObj[j]->getY() + bulletObj[j]->getSize() / 2.f;
+
+					if (CollisionRect(minX, minY, maxX, maxY, minX1, minY1, maxX1, maxY1)) {
+						if (actorObj[i]->getType() == OBJECT_CHARACTER) {
+							bulletObj[j]->SetDamage(actorObj[i]->getLife());
+							actorObj[i]->SetDamage(bulletObj[j]->getLife());
+							bulletObj[j]->SetLife(0.f);
+							actorObj[i]->SetLife(0.f);
+						}
+					}
+				}
 			}
+		}
+	}
 
-			if (collisionBDCount > 0)
-			{
-				DeleteObj(i);
+	// character and arrow
+	for (int i = 0; i < MAX_OBJ_COUNT; i++) {
+		if (actorObj[i] != NULL) {
+			for (int j = i + 1; j < MAX_OBJ_COUNT; j++) {
+				if (actorObj[j] != NULL && actorObj[i] != NULL) {
+					float minX, minY;
+					float maxX, maxY;
+					float minX1, minY1;
+					float maxX1, maxY1;
 
-				buildingObj->life -= 10.f;
+					minX = actorObj[i]->getX() - actorObj[i]->getSize() / 2.f;
+					minY = actorObj[i]->getY() - actorObj[i]->getSize() / 2.f;
+					maxX = actorObj[i]->getX() + actorObj[i]->getSize() / 2.f;
+					maxY = actorObj[i]->getY() + actorObj[i]->getSize() / 2.f;
+					minX1 = actorObj[j]->getX() - actorObj[j]->getSize() / 2.f;
+					minY1 = actorObj[j]->getY() - actorObj[j]->getSize() / 2.f;
+					maxX1 = actorObj[j]->getX() + actorObj[j]->getSize() / 2.f;
+					maxY1 = actorObj[j]->getY() + actorObj[j]->getSize() / 2.f;
 
-				if (buildingObj->life < 0.f)
-					delete buildingObj;
-			}
-			if (collisionBLCount > 0) {
-				// DeleteBLObj(i);
-
-				m_obj[i]->life -= bulletObj[i]->life;
-
-				if (m_obj[i]->life < 0.f)
-					DeleteObj(i);
+					if (CollisionRect(minX, minY, maxX, maxY, minX1, minY1, maxX1, maxY1)) {
+						if ((actorObj[i]->getType() == OBJECT_CHARACTER) && (actorObj[j]->getType() == OBJECT_ARROW)) {
+							actorObj[i]->SetDamage(actorObj[j]->getLife());
+						}
+					}
+				}
 			}
 		}
 	}
