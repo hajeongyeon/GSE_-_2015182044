@@ -5,7 +5,7 @@
 #include "Dependencies\glew.h"
 #include "Dependencies\freeglut.h"
 
-SceneMgr *mgr = NULL;
+SceneMgr* mgr = NULL;
 
 DWORD g_startTime = NULL;
 
@@ -42,8 +42,13 @@ void MouseInput(int button, int state, int x, int y)
 	{
 		if (g_LButtonDown)
 		{
-			for (int i = 0; i < 1; i++)
-				mgr->AddObj(x - 250, -y + 250, OBJECT_CHARACTER);
+			if (-y + 350 < 0) {
+				for (int i = 0; i < 1; i++)
+					if (mgr->getGO()->getCharacterTime() > 7.f) {
+						mgr->AddObj(x - 250, -y + 350, OBJECT_CHARACTER, TEAM2);
+						mgr->getGO()->SetCharacterTime(0.f);
+					}
+			}
 		}
 		g_LButtonDown = false;
 	}
@@ -67,7 +72,7 @@ int main(int argc, char **argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowPosition(100, 100);
-	glutInitWindowSize(500, 500);
+	glutInitWindowSize(500, 700);
 	glutCreateWindow("Game Software Engineering KPU");
 
 	glewInit();
@@ -77,7 +82,8 @@ int main(int argc, char **argv)
 		std::cout << "GLEW 3.0 not supported\n ";
 
 	mgr = new SceneMgr();
-	mgr->AddObj(0, 0, OBJECT_BUILDING);
+	mgr->AddBuildingObj();
+
 	g_startTime = timeGetTime();
 
 	glutDisplayFunc(RenderScene);
