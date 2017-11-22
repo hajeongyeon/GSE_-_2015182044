@@ -20,6 +20,7 @@ private:
 
 	int objType;
 	int team;
+	float level;
 
 	float life;
 	float LifeTime = 100000.f;
@@ -42,6 +43,7 @@ public:
 	float getSize() { return size; }
 	int getType() { return objType; }
 	int getTeam() { return team; }
+	float getLevel() { return level; }
 	float getLife() { return life; }
 	float getLifeTime() { return LifeTime; }
 	float getBulletTime() { return bulletTime; }

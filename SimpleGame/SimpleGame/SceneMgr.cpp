@@ -37,6 +37,7 @@ SceneMgr::~SceneMgr()
 			delete actorObj[i];
 
 	delete renderer;
+	delete[] buildingObj;
 	delete[] bulletObj;
 	delete[] actorObj;
 }
@@ -46,22 +47,24 @@ void SceneMgr::DrawSolidRect()
 	for (int i = 0; i < 3; ++i)
 		if (buildingObj[i] != NULL)
 			renderer->DrawTexturedRect(buildingObj[i]->getX(), buildingObj[i]->getY(), 0, buildingObj[i]->getSize(),
-				buildingObj[i]->color[0], buildingObj[i]->color[1], buildingObj[i]->color[2], buildingObj[i]->color[3], textureBuilding1);
+				buildingObj[i]->color[0], buildingObj[i]->color[1], buildingObj[i]->color[2], buildingObj[i]->color[3], 
+				textureBuilding1, buildingObj[i]->getLevel());
 
 	for (int i = 3; i < 6; ++i)
 		if (buildingObj[i] != NULL)
 			renderer->DrawTexturedRect(buildingObj[i]->getX(), buildingObj[i]->getY(), 0, buildingObj[i]->getSize(),
-				buildingObj[i]->color[0], buildingObj[i]->color[1], buildingObj[i]->color[2], buildingObj[i]->color[3], textureBuilding2);
+				buildingObj[i]->color[0], buildingObj[i]->color[1], buildingObj[i]->color[2], buildingObj[i]->color[3], 
+				textureBuilding2, buildingObj[i]->getLevel());
 
 	for (int i = 0; i < MAX_OBJ_COUNT; ++i)
 		if (actorObj[i] != NULL)
-			renderer->DrawSolidRect(actorObj[i]->getX(), actorObj[i]->getY(), 0,
-				actorObj[i]->getSize(), actorObj[i]->color[0], actorObj[i]->color[1], actorObj[i]->color[2], actorObj[i]->color[3]);
+			renderer->DrawSolidRect(actorObj[i]->getX(), actorObj[i]->getY(), 0, actorObj[i]->getSize(), 
+				actorObj[i]->color[0], actorObj[i]->color[1], actorObj[i]->color[2], actorObj[i]->color[3], actorObj[i]->getLevel());
 
 	for(int i =0; i< MAX_BL_COUNT; ++i)
 		if (bulletObj[i] != NULL)
-			renderer->DrawSolidRect(bulletObj[i]->getX(), bulletObj[i]->getY(), 0,
-				bulletObj[i]->getSize(), bulletObj[i]->color[0], bulletObj[i]->color[1], bulletObj[i]->color[2], bulletObj[i]->color[3]);
+			renderer->DrawSolidRect(bulletObj[i]->getX(), bulletObj[i]->getY(), 0, bulletObj[i]->getSize(), 
+				bulletObj[i]->color[0], bulletObj[i]->color[1], bulletObj[i]->color[2], bulletObj[i]->color[3], bulletObj[i]->getLevel());
 }
 
 void SceneMgr::AddBuildingObj()
@@ -268,8 +271,6 @@ void SceneMgr::Collision()
 							if (actorObj[i]->getType() == OBJECT_CHARACTER) {
 								bulletObj[j]->SetDamage(actorObj[i]->getLife());
 								actorObj[i]->SetDamage(bulletObj[j]->getLife());
-								bulletObj[j]->SetLife(0.f);
-								actorObj[i]->SetLife(0.f);
 							}
 						}
 					}
@@ -278,13 +279,42 @@ void SceneMgr::Collision()
 		}
 	}
 
-	// character and arrow
+	// building and bullet
+	for (int i = 0; i < 6; i++) {
+		if (buildingObj[i] != NULL) {
+			for (int j = 0; j < MAX_BL_COUNT; j++) {
+				if (bulletObj[j] != NULL) {
+					if ((buildingObj[i]->getTeam() == TEAM1 && bulletObj[j]->getTeam() == TEAM2) || (buildingObj[i]->getTeam() == TEAM2 && bulletObj[j]->getTeam() == TEAM1)) {
+						float minX, minY;
+						float maxX, maxY;
+						float minX1, minY1;
+						float maxX1, maxY1;
+
+						minX = buildingObj[i]->getX() - buildingObj[i]->getSize() / 2.f;
+						minY = buildingObj[i]->getY() - buildingObj[i]->getSize() / 2.f;
+						maxX = buildingObj[i]->getX() + buildingObj[i]->getSize() / 2.f;
+						maxY = buildingObj[i]->getY() + buildingObj[i]->getSize() / 2.f;
+						minX1 = bulletObj[j]->getX() - bulletObj[j]->getSize() / 2.f;
+						minY1 = bulletObj[j]->getY() - bulletObj[j]->getSize() / 2.f;
+						maxX1 = bulletObj[j]->getX() + bulletObj[j]->getSize() / 2.f;
+						maxY1 = bulletObj[j]->getY() + bulletObj[j]->getSize() / 2.f;
+
+						if (CollisionRect(minX, minY, maxX, maxY, minX1, minY1, maxX1, maxY1)) {
+							buildingObj[i]->SetDamage(bulletObj[j]->getLife());
+							bulletObj[j]->SetLife(0.f);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// team1 character and team2 arrow
 	for (int i = 0; i < MAX_OBJ_COUNT; i++) {
 		if (actorObj[i] != NULL) {
-			for (int j = i + 1; j < MAX_OBJ_COUNT; j++) {
+			for (int j = 0; j < MAX_OBJ_COUNT; j++) {
 				if (actorObj[j] != NULL && actorObj[i] != NULL) {
-					if (((actorObj[i]->getType() == OBJECT_CHARACTER && actorObj[i]->getTeam() == TEAM1) && (actorObj[j]->getType() == OBJECT_ARROW && actorObj[j]->getTeam() == TEAM2))
-					|| ((actorObj[i]->getType() == OBJECT_ARROW && actorObj[i]->getTeam() == TEAM1) && (actorObj[j]->getType() == OBJECT_CHARACTER && actorObj[j]->getTeam() == TEAM2))) {
+					if ((actorObj[i]->getType() == OBJECT_CHARACTER && actorObj[i]->getTeam() == TEAM1) && (actorObj[j]->getType() == OBJECT_ARROW && actorObj[j]->getTeam() == TEAM2)) {
 						float minX, minY;
 						float maxX, maxY;
 						float minX1, minY1;
@@ -302,6 +332,39 @@ void SceneMgr::Collision()
 						if (CollisionRect(minX, minY, maxX, maxY, minX1, minY1, maxX1, maxY1)) {
 							if ((actorObj[i]->getType() == OBJECT_CHARACTER) && (actorObj[j]->getType() == OBJECT_ARROW)) {
 								actorObj[i]->SetDamage(actorObj[j]->getLife());
+								actorObj[j]->SetLife(0.f);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// team2 character and team1 arrow
+	for (int i = 0; i < MAX_OBJ_COUNT; i++) {
+		if (actorObj[i] != NULL) {
+			for (int j = 0; j < MAX_OBJ_COUNT; j++) {
+				if (actorObj[j] != NULL && actorObj[i] != NULL) {
+					if ((actorObj[i]->getType() == OBJECT_CHARACTER && actorObj[i]->getTeam() == TEAM2) && (actorObj[j]->getType() == OBJECT_ARROW && actorObj[j]->getTeam() == TEAM1)) {
+						float minX, minY;
+						float maxX, maxY;
+						float minX1, minY1;
+						float maxX1, maxY1;
+
+						minX = actorObj[i]->getX() - actorObj[i]->getSize() / 2.f;
+						minY = actorObj[i]->getY() - actorObj[i]->getSize() / 2.f;
+						maxX = actorObj[i]->getX() + actorObj[i]->getSize() / 2.f;
+						maxY = actorObj[i]->getY() + actorObj[i]->getSize() / 2.f;
+						minX1 = actorObj[j]->getX() - actorObj[j]->getSize() / 2.f;
+						minY1 = actorObj[j]->getY() - actorObj[j]->getSize() / 2.f;
+						maxX1 = actorObj[j]->getX() + actorObj[j]->getSize() / 2.f;
+						maxY1 = actorObj[j]->getY() + actorObj[j]->getSize() / 2.f;
+
+						if (CollisionRect(minX, minY, maxX, maxY, minX1, minY1, maxX1, maxY1)) {
+							if ((actorObj[i]->getType() == OBJECT_CHARACTER) && (actorObj[j]->getType() == OBJECT_ARROW)) {
+								actorObj[i]->SetDamage(actorObj[j]->getLife());
+								actorObj[j]->SetLife(0.f);
 							}
 						}
 					}

@@ -17,13 +17,14 @@ GameObject::GameObject(float x, float y, int type, int team) :x(x), y(y), size(s
 			vx = 300.f *(((float)std::rand() / (float)RAND_MAX) - 0.5f);
 			vy = 300.f *(((float)std::rand() / (float)RAND_MAX) - 0.5f);
 
-			size = 10;
-			life = 10;
+			size = 30;
+			life = 100;
+			level = 0.2;
 		}
 		else if (type == OBJECT_BUILDING) {
 			color[0] = 1;
-			color[1] = 0;
-			color[2] = 0;
+			color[1] = 1;
+			color[2] = 1;
 			color[3] = 1;
 
 			vx = 0;
@@ -31,6 +32,7 @@ GameObject::GameObject(float x, float y, int type, int team) :x(x), y(y), size(s
 
 			size = 100;
 			life = 500;
+			level = 0.1;
 		}
 		else if (type == OBJECT_BULLET)
 		{
@@ -42,8 +44,9 @@ GameObject::GameObject(float x, float y, int type, int team) :x(x), y(y), size(s
 			vx = 600.f *(((float)std::rand() / (float)RAND_MAX) - 0.5f);
 			vy = 600.f *(((float)std::rand() / (float)RAND_MAX) - 0.5f);
 
-			size = 2;
-			life = 20;
+			size = 4;
+			life = 15;
+			level = 0.3;
 		}
 		else if (type == OBJECT_ARROW)
 		{
@@ -55,8 +58,9 @@ GameObject::GameObject(float x, float y, int type, int team) :x(x), y(y), size(s
 			vx = 100.f *(((float)std::rand() / (float)RAND_MAX) - 0.5f);
 			vy = 100.f *(((float)std::rand() / (float)RAND_MAX) - 0.5f);
 
-			size = 2;
+			size = 4;
 			life = 10;
+			level = 0.3;
 		}
 	}
 	else if (team == TEAM2) {
@@ -69,12 +73,13 @@ GameObject::GameObject(float x, float y, int type, int team) :x(x), y(y), size(s
 			vx = 300.f *(((float)std::rand() / (float)RAND_MAX) - 0.5f);
 			vy = 300.f *(((float)std::rand() / (float)RAND_MAX) - 0.5f);
 
-			size = 10;
-			life = 10;
+			size = 30;
+			life = 100;
+			level = 0.2;
 		}
 		else if (type == OBJECT_BUILDING) {
-			color[0] = 0;
-			color[1] = 0;
+			color[0] = 1;
+			color[1] = 1;
 			color[2] = 1;
 			color[3] = 1;
 
@@ -83,6 +88,7 @@ GameObject::GameObject(float x, float y, int type, int team) :x(x), y(y), size(s
 
 			size = 100;
 			life = 500;
+			level = 0.1;
 		}
 		else if (type == OBJECT_BULLET)
 		{
@@ -94,8 +100,9 @@ GameObject::GameObject(float x, float y, int type, int team) :x(x), y(y), size(s
 			vx = 600.f *(((float)std::rand() / (float)RAND_MAX) - 0.5f);
 			vy = 600.f *(((float)std::rand() / (float)RAND_MAX) - 0.5f);
 
-			size = 2;
-			life = 20;
+			size = 4;
+			life = 15;
+			level = 0.3;
 		}
 		else if (type == OBJECT_ARROW)
 		{
@@ -107,8 +114,9 @@ GameObject::GameObject(float x, float y, int type, int team) :x(x), y(y), size(s
 			vx = 100.f *(((float)std::rand() / (float)RAND_MAX) - 0.5f);
 			vy = 100.f *(((float)std::rand() / (float)RAND_MAX) - 0.5f);
 
-			size = 2;
+			size = 4;
 			life = 10;
+			level = 0.3;
 		}
 	}
 }

@@ -44,7 +44,7 @@ void MouseInput(int button, int state, int x, int y)
 		{
 			if (-y + 350 < 0) {
 				for (int i = 0; i < 1; i++)
-					if (mgr->getGO()->getCharacterTime() > 7.f) {
+					if (mgr->getGO()->getCharacterTime() > 0.f) {
 						mgr->AddObj(x - 250, -y + 350, OBJECT_CHARACTER, TEAM2);
 						mgr->getGO()->SetCharacterTime(0.f);
 					}
