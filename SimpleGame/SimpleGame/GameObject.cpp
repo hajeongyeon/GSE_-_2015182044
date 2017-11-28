@@ -5,8 +5,7 @@ GameObject::GameObject(float x, float y, int type, int team) :x(x), y(y), size(s
 {
 	bulletTime = 0.f;
 	arrowTime = 0.f;
-	characterTime = 0.f;
-	
+
 	if (team == TEAM1) {
 		if (type == OBJECT_CHARACTER) {
 			color[0] = 1;
@@ -127,7 +126,6 @@ void GameObject::Update(float elapsedTime)
 
 	bulletTime += ElapsedTimeInSecond;
 	arrowTime += ElapsedTimeInSecond;
-	characterTime += ElapsedTimeInSecond;
 
 	x = x + vx * ElapsedTimeInSecond;
 	y = y + vy * ElapsedTimeInSecond;

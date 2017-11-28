@@ -20,6 +20,9 @@ SceneMgr::SceneMgr()
 
 	textureBuilding1 = renderer->CreatePngTexture("./Resource/team1building.png");
 	textureBuilding2 = renderer->CreatePngTexture("./Resource/team2building.png");
+
+	team1time = 0.f;
+	team2time = 7.f;
 }
 
 SceneMgr::~SceneMgr()
@@ -45,21 +48,37 @@ SceneMgr::~SceneMgr()
 void SceneMgr::DrawSolidRect()
 {
 	for (int i = 0; i < 3; ++i)
-		if (buildingObj[i] != NULL)
+		if (buildingObj[i] != NULL) {
 			renderer->DrawTexturedRect(buildingObj[i]->getX(), buildingObj[i]->getY(), 0, buildingObj[i]->getSize(),
-				buildingObj[i]->color[0], buildingObj[i]->color[1], buildingObj[i]->color[2], buildingObj[i]->color[3], 
+				buildingObj[i]->color[0], buildingObj[i]->color[1], buildingObj[i]->color[2], buildingObj[i]->color[3],
 				textureBuilding1, buildingObj[i]->getLevel());
+			renderer->DrawSolidRectGauge(buildingObj[i]->getX(), buildingObj[i]->getY() + 60, 0, 
+				100, 5, 1, 0, 0, 1, buildingObj[i]->getLife() / 500, buildingObj[i]->getLevel());
+		}
 
 	for (int i = 3; i < 6; ++i)
-		if (buildingObj[i] != NULL)
+		if (buildingObj[i] != NULL) {
 			renderer->DrawTexturedRect(buildingObj[i]->getX(), buildingObj[i]->getY(), 0, buildingObj[i]->getSize(),
-				buildingObj[i]->color[0], buildingObj[i]->color[1], buildingObj[i]->color[2], buildingObj[i]->color[3], 
+				buildingObj[i]->color[0], buildingObj[i]->color[1], buildingObj[i]->color[2], buildingObj[i]->color[3],
 				textureBuilding2, buildingObj[i]->getLevel());
+			renderer->DrawSolidRectGauge(buildingObj[i]->getX(), buildingObj[i]->getY() + 60, 0,
+				100, 5, 0, 0, 1, 1, buildingObj[i]->getLife() / 500, buildingObj[i]->getLevel());
+		}
 
 	for (int i = 0; i < MAX_OBJ_COUNT; ++i)
-		if (actorObj[i] != NULL)
-			renderer->DrawSolidRect(actorObj[i]->getX(), actorObj[i]->getY(), 0, actorObj[i]->getSize(), 
+		if (actorObj[i] != NULL) {
+			renderer->DrawSolidRect(actorObj[i]->getX(), actorObj[i]->getY(), 0, actorObj[i]->getSize(),
 				actorObj[i]->color[0], actorObj[i]->color[1], actorObj[i]->color[2], actorObj[i]->color[3], actorObj[i]->getLevel());
+
+			if (actorObj[i]->getType() == OBJECT_CHARACTER) {
+				if (actorObj[i]->getTeam() == TEAM1)
+					renderer->DrawSolidRectGauge(actorObj[i]->getX(), actorObj[i]->getY() + 20, 0,
+						40, 5, 1, 0, 0, 1, actorObj[i]->getLife() / 100, actorObj[i]->getLevel());
+				else 
+					renderer->DrawSolidRectGauge(actorObj[i]->getX(), actorObj[i]->getY() + 20, 0,
+						40, 5, 0, 0, 1, 1, actorObj[i]->getLife() / 100, actorObj[i]->getLevel());
+			}
+		}
 
 	for(int i =0; i< MAX_BL_COUNT; ++i)
 		if (bulletObj[i] != NULL)
@@ -91,6 +110,10 @@ int SceneMgr::AddObj(float x, float y, int type, int team)
 		for (int i = 0; i < MAX_OBJ_COUNT; i++) {
 			if (actorObj[i] == NULL) {
 				actorObj[i] = new GameObject(x, y, type, team);
+
+				if (type == OBJECT_CHARACTER && team == TEAM2)
+					team2time = 0;
+
 				return i;
 			}
 		}
@@ -99,6 +122,9 @@ int SceneMgr::AddObj(float x, float y, int type, int team)
 
 void SceneMgr::UpdateObj(float elapsedTime)
 {
+	team1time += elapsedTime / 1000;
+	team2time += elapsedTime / 1000;
+
 	srand((unsigned int)time(NULL));
 
 	Collision();
@@ -130,9 +156,9 @@ void SceneMgr::UpdateObj(float elapsedTime)
 	}
 
 	// team1 character 积己
-	if (buildingObj[0]->getCharacterTime() > 5.f) {
+	if (team1time >= 5.f) {
 		AddObj(rand() % 500 - 249, rand() % 350, OBJECT_CHARACTER, TEAM1);
-		buildingObj[0]->SetCharacterTime(0.f);
+		team1time = 0.f;
 	}
 
 	// bullet life 贸府 棺 诀单捞飘

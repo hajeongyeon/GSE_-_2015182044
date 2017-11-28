@@ -25,7 +25,6 @@ private:
 	float life;
 	float LifeTime = 100000.f;
 
-	float characterTime;
 	float bulletTime;
 	float arrowTime;
 
@@ -48,12 +47,10 @@ public:
 	float getLifeTime() { return LifeTime; }
 	float getBulletTime() { return bulletTime; }
 	float getArrowTime() { return arrowTime; }
-	float getCharacterTime() { return characterTime; }
 
 	void SetLife(float currentlife) { life = currentlife; }
 	void SetArrowTime(float time) { arrowTime = time; }
 	void SetBulletTime(float time) { bulletTime = time; }
-	void SetCharacterTime(float time) { characterTime = time; }
 	void SetDamage(float damage) { life -= damage; }
 };
 

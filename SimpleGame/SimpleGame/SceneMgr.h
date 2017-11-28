@@ -16,6 +16,8 @@ private:
 	GLuint textureBuilding1;
 	GLuint textureBuilding2;
 
+	float team1time, team2time;
+
 public:
 	SceneMgr();
 	~SceneMgr();
@@ -31,5 +33,7 @@ public:
 
 	void Collision();
 	bool CollisionRect(float minX, float minY, float maxX, float maxY, float minX1, float minY1, float maxX1, float maxY1);
+
+	float getTeam2Time() { return team2time; }
 };
 
