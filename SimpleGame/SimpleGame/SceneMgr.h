@@ -8,21 +8,24 @@ class SceneMgr
 {
 private:
 	Renderer* renderer;
-
+	
+	GameObject* Bgr;
 	GameObject* buildingObj[6];
 	GameObject* actorObj[MAX_OBJ_COUNT];
 	GameObject* bulletObj[MAX_BL_COUNT];
 
 	GLuint textureBuilding1;
 	GLuint textureBuilding2;
+	GLuint textureBgr;
+	GLuint textureRabbit;
+	GLuint textureDog;
 
-	float team1time, team2time;
+	float team1time, team2time, testtime;
+	int rabbitX, DogX, DogY;
 
 public:
 	SceneMgr();
 	~SceneMgr();
-
-	GameObject* getGO() { return buildingObj[3]; }
 
 	void DrawSolidRect();
 

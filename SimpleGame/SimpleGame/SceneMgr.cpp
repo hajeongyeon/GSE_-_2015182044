@@ -20,9 +20,16 @@ SceneMgr::SceneMgr()
 
 	textureBuilding1 = renderer->CreatePngTexture("./Resource/team1building.png");
 	textureBuilding2 = renderer->CreatePngTexture("./Resource/team2building.png");
+	textureBgr = renderer->CreatePngTexture("./Resource/background.png");
+	textureRabbit = renderer->CreatePngTexture("./Resource/rabbit.png");
+	textureDog = renderer->CreatePngTexture("./Resource/dog2.png");
 
 	team1time = 0.f;
 	team2time = 7.f;
+
+	rabbitX = 0;
+	DogX = 0;
+	DogY = 0;
 }
 
 SceneMgr::~SceneMgr()
@@ -47,6 +54,8 @@ SceneMgr::~SceneMgr()
 
 void SceneMgr::DrawSolidRect()
 {
+	renderer->DrawTexturedRect(0, 0, 0, 700, 1, 1, 1, 1, textureBgr, 0.5);
+
 	for (int i = 0; i < 3; ++i)
 		if (buildingObj[i] != NULL) {
 			renderer->DrawTexturedRect(buildingObj[i]->getX(), buildingObj[i]->getY(), 0, buildingObj[i]->getSize(),
@@ -67,16 +76,25 @@ void SceneMgr::DrawSolidRect()
 
 	for (int i = 0; i < MAX_OBJ_COUNT; ++i)
 		if (actorObj[i] != NULL) {
-			renderer->DrawSolidRect(actorObj[i]->getX(), actorObj[i]->getY(), 0, actorObj[i]->getSize(),
-				actorObj[i]->color[0], actorObj[i]->color[1], actorObj[i]->color[2], actorObj[i]->color[3], actorObj[i]->getLevel());
-
 			if (actorObj[i]->getType() == OBJECT_CHARACTER) {
-				if (actorObj[i]->getTeam() == TEAM1)
+				if (actorObj[i]->getTeam() == TEAM1) {
+					renderer->DrawTexturedRectSeq(actorObj[i]->getX(), actorObj[i]->getY(), 0, actorObj[i]->getSize(),
+						actorObj[i]->color[0], actorObj[i]->color[1], actorObj[i]->color[2], actorObj[i]->color[3], textureRabbit,
+						rabbitX, 0, 8, 1, actorObj[i]->getLevel());
 					renderer->DrawSolidRectGauge(actorObj[i]->getX(), actorObj[i]->getY() + 20, 0,
 						40, 5, 1, 0, 0, 1, actorObj[i]->getLife() / 100, actorObj[i]->getLevel());
-				else 
+				}
+				else {
+					renderer->DrawTexturedRectSeq(actorObj[i]->getX(), actorObj[i]->getY(), 0, actorObj[i]->getSize(),
+						actorObj[i]->color[0], actorObj[i]->color[1], actorObj[i]->color[2], actorObj[i]->color[3], textureDog,
+						DogX, 0, 9, 1, actorObj[i]->getLevel());
 					renderer->DrawSolidRectGauge(actorObj[i]->getX(), actorObj[i]->getY() + 20, 0,
 						40, 5, 0, 0, 1, 1, actorObj[i]->getLife() / 100, actorObj[i]->getLevel());
+				}
+			}
+			else {
+				renderer->DrawSolidRect(actorObj[i]->getX(), actorObj[i]->getY(), 0, actorObj[i]->getSize(),
+					actorObj[i]->color[0], actorObj[i]->color[1], actorObj[i]->color[2], actorObj[i]->color[3], actorObj[i]->getLevel());
 			}
 		}
 
@@ -88,6 +106,8 @@ void SceneMgr::DrawSolidRect()
 
 void SceneMgr::AddBuildingObj()
 {
+	Bgr = new GameObject(0, 0, 0, 0);
+
 	buildingObj[0] = new GameObject(-150, 250, OBJECT_BUILDING, TEAM1);
 	buildingObj[1] = new GameObject(0, 250, OBJECT_BUILDING, TEAM1);
 	buildingObj[2] = new GameObject(150, 250, OBJECT_BUILDING, TEAM1);
@@ -124,6 +144,19 @@ void SceneMgr::UpdateObj(float elapsedTime)
 {
 	team1time += elapsedTime / 1000;
 	team2time += elapsedTime / 1000;
+	testtime += elapsedTime / 1000;
+
+	if (testtime >= 0.1f) {
+		rabbitX += 1;
+		if (rabbitX >= 8)
+			rabbitX = 0;
+
+		DogX += 1;
+		if (DogX >= 9)
+			DogX = 0;
+
+		testtime = 0.f;
+	}
 
 	srand((unsigned int)time(NULL));
 
