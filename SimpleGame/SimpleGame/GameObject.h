@@ -39,6 +39,7 @@ public:
 
 	float getX() { return x; }
 	float getY() { return y; }
+	float getVY() { return vy; }
 	float getSize() { return size; }
 	int getType() { return objType; }
 	int getTeam() { return team; }

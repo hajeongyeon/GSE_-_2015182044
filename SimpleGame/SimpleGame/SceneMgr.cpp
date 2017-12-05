@@ -23,13 +23,14 @@ SceneMgr::SceneMgr()
 	textureBgr = renderer->CreatePngTexture("./Resource/background.png");
 	textureRabbit = renderer->CreatePngTexture("./Resource/rabbit.png");
 	textureDog = renderer->CreatePngTexture("./Resource/dog2.png");
+	textureEffect = renderer->CreatePngTexture("./Resource/effect.png");
 
 	team1time = 0.f;
 	team2time = 7.f;
+	effecttime = 0.f;
 
 	rabbitX = 0;
 	DogX = 0;
-	DogY = 0;
 }
 
 SceneMgr::~SceneMgr()
@@ -56,16 +57,17 @@ void SceneMgr::DrawSolidRect()
 {
 	renderer->DrawTexturedRect(0, 0, 0, 700, 1, 1, 1, 1, textureBgr, 0.5);
 
-	for (int i = 0; i < 3; ++i)
+	for (int i = 0; i < 3; ++i) {
 		if (buildingObj[i] != NULL) {
 			renderer->DrawTexturedRect(buildingObj[i]->getX(), buildingObj[i]->getY(), 0, buildingObj[i]->getSize(),
 				buildingObj[i]->color[0], buildingObj[i]->color[1], buildingObj[i]->color[2], buildingObj[i]->color[3],
 				textureBuilding1, buildingObj[i]->getLevel());
-			renderer->DrawSolidRectGauge(buildingObj[i]->getX(), buildingObj[i]->getY() + 60, 0, 
+			renderer->DrawSolidRectGauge(buildingObj[i]->getX(), buildingObj[i]->getY() + 60, 0,
 				100, 5, 1, 0, 0, 1, buildingObj[i]->getLife() / 500, buildingObj[i]->getLevel());
 		}
+	}
 
-	for (int i = 3; i < 6; ++i)
+	for (int i = 3; i < 6; ++i) {
 		if (buildingObj[i] != NULL) {
 			renderer->DrawTexturedRect(buildingObj[i]->getX(), buildingObj[i]->getY(), 0, buildingObj[i]->getSize(),
 				buildingObj[i]->color[0], buildingObj[i]->color[1], buildingObj[i]->color[2], buildingObj[i]->color[3],
@@ -73,8 +75,9 @@ void SceneMgr::DrawSolidRect()
 			renderer->DrawSolidRectGauge(buildingObj[i]->getX(), buildingObj[i]->getY() + 60, 0,
 				100, 5, 0, 0, 1, 1, buildingObj[i]->getLife() / 500, buildingObj[i]->getLevel());
 		}
+	}
 
-	for (int i = 0; i < MAX_OBJ_COUNT; ++i)
+	for (int i = 0; i < MAX_OBJ_COUNT; ++i) {
 		if (actorObj[i] != NULL) {
 			if (actorObj[i]->getType() == OBJECT_CHARACTER) {
 				if (actorObj[i]->getTeam() == TEAM1) {
@@ -97,11 +100,24 @@ void SceneMgr::DrawSolidRect()
 					actorObj[i]->color[0], actorObj[i]->color[1], actorObj[i]->color[2], actorObj[i]->color[3], actorObj[i]->getLevel());
 			}
 		}
+	}
 
-	for(int i =0; i< MAX_BL_COUNT; ++i)
-		if (bulletObj[i] != NULL)
-			renderer->DrawSolidRect(bulletObj[i]->getX(), bulletObj[i]->getY(), 0, bulletObj[i]->getSize(), 
-				bulletObj[i]->color[0], bulletObj[i]->color[1], bulletObj[i]->color[2], bulletObj[i]->color[3], bulletObj[i]->getLevel());
+	for (int i = 0; i < MAX_BL_COUNT; ++i) {
+		if (bulletObj[i] != NULL) {
+			if (bulletObj[i]->getVY() < 0)
+				renderer->DrawParticle(bulletObj[i]->getX(), bulletObj[i]->getY(), 0, bulletObj[i]->getSize(),
+					bulletObj[i]->color[0], bulletObj[i]->color[1], bulletObj[i]->color[2], bulletObj[i]->color[3],
+					0, 1, textureEffect, effecttime);
+			else if (bulletObj[i]->getVY() > 0)
+				renderer->DrawParticle(bulletObj[i]->getX(), bulletObj[i]->getY(), 0, bulletObj[i]->getSize(),
+					bulletObj[i]->color[0], bulletObj[i]->color[1], bulletObj[i]->color[2], bulletObj[i]->color[3],
+					0, -1, textureEffect, effecttime);
+			else 
+				renderer->DrawParticle(bulletObj[i]->getX(), bulletObj[i]->getY(), 0, bulletObj[i]->getSize(),
+					bulletObj[i]->color[0], bulletObj[i]->color[1], bulletObj[i]->color[2], bulletObj[i]->color[3],
+					0, 0, textureEffect, effecttime);
+		}
+	}
 }
 
 void SceneMgr::AddBuildingObj()
@@ -144,9 +160,10 @@ void SceneMgr::UpdateObj(float elapsedTime)
 {
 	team1time += elapsedTime / 1000;
 	team2time += elapsedTime / 1000;
-	testtime += elapsedTime / 1000;
+	runtime += elapsedTime / 1000;
+	effecttime += elapsedTime / 1000;
 
-	if (testtime >= 0.1f) {
+	if (runtime >= 0.1f) {
 		rabbitX += 1;
 		if (rabbitX >= 8)
 			rabbitX = 0;
@@ -155,7 +172,7 @@ void SceneMgr::UpdateObj(float elapsedTime)
 		if (DogX >= 9)
 			DogX = 0;
 
-		testtime = 0.f;
+		runtime = 0.f;
 	}
 
 	srand((unsigned int)time(NULL));
@@ -328,8 +345,8 @@ void SceneMgr::Collision()
 
 						if (CollisionRect(minX, minY, maxX, maxY, minX1, minY1, maxX1, maxY1)) {
 							if (actorObj[i]->getType() == OBJECT_CHARACTER) {
-								bulletObj[j]->SetDamage(actorObj[i]->getLife());
 								actorObj[i]->SetDamage(bulletObj[j]->getLife());
+								bulletObj[j]->SetDamage(actorObj[i]->getLife());
 							}
 						}
 					}

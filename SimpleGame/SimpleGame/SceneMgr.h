@@ -19,8 +19,9 @@ private:
 	GLuint textureBgr;
 	GLuint textureRabbit;
 	GLuint textureDog;
+	GLuint textureEffect;
 
-	float team1time, team2time, testtime;
+	float team1time, team2time, runtime, effecttime;
 	int rabbitX, DogX, DogY;
 
 public:
