@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdlib>
 
-#define MAX_OBJ_COUNT 300
+#define MAX_OBJ_COUNT 100
 #define MAX_BL_COUNT 100
 
 #define OBJECT_BUILDING 1

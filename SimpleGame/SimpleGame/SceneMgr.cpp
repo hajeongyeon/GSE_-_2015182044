@@ -5,6 +5,7 @@
 SceneMgr::SceneMgr()
 {
 	renderer = new Renderer(500, 700);
+	sound = new Sound();
 
 	if (!renderer->IsInitialized())
 		std::cout << "Renderer could not be initialized.. \n";
@@ -24,6 +25,8 @@ SceneMgr::SceneMgr()
 	textureRabbit = renderer->CreatePngTexture("./Resource/rabbit.png");
 	textureDog = renderer->CreatePngTexture("./Resource/dog2.png");
 	textureEffect = renderer->CreatePngTexture("./Resource/effect.png");
+
+	soundBG = sound->CreateSound("./Dependencies/SoundSamples/MF-W-90.XM");
 
 	team1time = 0.f;
 	team2time = 7.f;
@@ -64,6 +67,7 @@ void SceneMgr::DrawSolidRect()
 				textureBuilding1, buildingObj[i]->getLevel());
 			renderer->DrawSolidRectGauge(buildingObj[i]->getX(), buildingObj[i]->getY() + 60, 0,
 				100, 5, 1, 0, 0, 1, buildingObj[i]->getLife() / 500, buildingObj[i]->getLevel());
+			renderer->DrawText(buildingObj[i]->getX() - 40, buildingObj[i]->getY() - 70, GLUT_BITMAP_9_BY_15, 1, 1, 1, "BUILDING");
 		}
 	}
 
@@ -74,6 +78,7 @@ void SceneMgr::DrawSolidRect()
 				textureBuilding2, buildingObj[i]->getLevel());
 			renderer->DrawSolidRectGauge(buildingObj[i]->getX(), buildingObj[i]->getY() + 60, 0,
 				100, 5, 0, 0, 1, 1, buildingObj[i]->getLife() / 500, buildingObj[i]->getLevel());
+			renderer->DrawText(buildingObj[i]->getX() - 40, buildingObj[i]->getY() - 70, GLUT_BITMAP_9_BY_15, 1, 1, 1, "BUILDING");
 		}
 	}
 
@@ -130,6 +135,8 @@ void SceneMgr::AddBuildingObj()
 	buildingObj[3] = new GameObject(-150, -250, OBJECT_BUILDING, TEAM2);
 	buildingObj[4] = new GameObject(0, -250, OBJECT_BUILDING, TEAM2);
 	buildingObj[5] = new GameObject(150, -250, OBJECT_BUILDING, TEAM2);
+
+	sound->PlaySound(soundBG, true, 0.2f);
 }
 
 int SceneMgr::AddObj(float x, float y, int type, int team)

@@ -3,6 +3,7 @@
 #include <iostream>
 #include "GameObject.h"
 #include "Renderer.h"
+#include "Sound.h"
 
 class SceneMgr
 {
@@ -21,8 +22,11 @@ private:
 	GLuint textureDog;
 	GLuint textureEffect;
 
+	Sound* sound;
+
 	float team1time, team2time, runtime, effecttime;
 	int rabbitX, DogX, DogY;
+	int soundBG;
 
 public:
 	SceneMgr();
