@@ -24,7 +24,7 @@ private:
 
 	Sound* sound;
 
-	float team1time, team2time, runtime, effecttime;
+	float team1time, team2time, runtime, effecttime, climatetime;
 	int rabbitX, DogX, DogY;
 	int soundBG;
 

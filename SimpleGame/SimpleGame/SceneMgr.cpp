@@ -59,6 +59,7 @@ SceneMgr::~SceneMgr()
 void SceneMgr::DrawSolidRect()
 {
 	renderer->DrawTexturedRect(0, 0, 0, 700, 1, 1, 1, 1, textureBgr, 0.5);
+	renderer->DrawParticleClimate(0, 0, 0, 1, 1, 1, 1, 1, -0.1, -0.1, textureEffect, climatetime, 0.01);
 
 	for (int i = 0; i < 3; ++i) {
 		if (buildingObj[i] != NULL) {
@@ -112,15 +113,15 @@ void SceneMgr::DrawSolidRect()
 			if (bulletObj[i]->getVY() < 0)
 				renderer->DrawParticle(bulletObj[i]->getX(), bulletObj[i]->getY(), 0, bulletObj[i]->getSize(),
 					bulletObj[i]->color[0], bulletObj[i]->color[1], bulletObj[i]->color[2], bulletObj[i]->color[3],
-					0, 1, textureEffect, effecttime);
+					0, 1, textureEffect, effecttime, bulletObj[i]->getLevel());
 			else if (bulletObj[i]->getVY() > 0)
 				renderer->DrawParticle(bulletObj[i]->getX(), bulletObj[i]->getY(), 0, bulletObj[i]->getSize(),
 					bulletObj[i]->color[0], bulletObj[i]->color[1], bulletObj[i]->color[2], bulletObj[i]->color[3],
-					0, -1, textureEffect, effecttime);
+					0, -1, textureEffect, effecttime, bulletObj[i]->getLevel());
 			else 
 				renderer->DrawParticle(bulletObj[i]->getX(), bulletObj[i]->getY(), 0, bulletObj[i]->getSize(),
 					bulletObj[i]->color[0], bulletObj[i]->color[1], bulletObj[i]->color[2], bulletObj[i]->color[3],
-					0, 0, textureEffect, effecttime);
+					0, 0, textureEffect, effecttime, bulletObj[i]->getLevel());
 		}
 	}
 }
@@ -169,6 +170,7 @@ void SceneMgr::UpdateObj(float elapsedTime)
 	team2time += elapsedTime / 1000;
 	runtime += elapsedTime / 1000;
 	effecttime += elapsedTime / 1000;
+	climatetime += elapsedTime / 1000;
 
 	if (runtime >= 0.1f) {
 		rabbitX += 1;
@@ -181,6 +183,8 @@ void SceneMgr::UpdateObj(float elapsedTime)
 
 		runtime = 0.f;
 	}
+	if (effecttime == 1.0f)
+		effecttime = 0.f;
 
 	srand((unsigned int)time(NULL));
 
