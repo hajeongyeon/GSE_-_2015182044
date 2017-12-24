@@ -52,7 +52,7 @@ void Sound::DeleteSound(int index)
 	m_soundList.erase(index);
 }
 
-void Sound::PlaySound(int index, bool bLoop, float volume)
+void Sound::StartSound(int index, bool bLoop, float volume)
 {
 	std::map<int, ISoundSource*>::iterator iter;
 

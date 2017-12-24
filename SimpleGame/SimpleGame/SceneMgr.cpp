@@ -27,6 +27,8 @@ SceneMgr::SceneMgr()
 	textureEffect = renderer->CreatePngTexture("./Resource/effect.png");
 
 	soundBG = sound->CreateSound("./Dependencies/SoundSamples/MF-W-90.XM");
+	soundEX = sound->CreateSound("./Dependencies/SoundSamples/explosion.wav");
+	soundAPP = sound->CreateSound("./Dependencies/SoundSamples/bell.wav");
 
 	team1time = 0.f;
 	team2time = 7.f;
@@ -68,7 +70,7 @@ void SceneMgr::DrawSolidRect()
 				textureBuilding1, buildingObj[i]->getLevel());
 			renderer->DrawSolidRectGauge(buildingObj[i]->getX(), buildingObj[i]->getY() + 60, 0,
 				100, 5, 1, 0, 0, 1, buildingObj[i]->getLife() / 500, buildingObj[i]->getLevel());
-			renderer->DrawText(buildingObj[i]->getX() - 40, buildingObj[i]->getY() - 70, GLUT_BITMAP_9_BY_15, 1, 1, 1, "BUILDING");
+			renderer->DrawText(buildingObj[i]->getX() - 30, buildingObj[i]->getY() - 70, GLUT_BITMAP_9_BY_15, 1, 1, 1, "BUILDING");
 		}
 	}
 
@@ -79,7 +81,7 @@ void SceneMgr::DrawSolidRect()
 				textureBuilding2, buildingObj[i]->getLevel());
 			renderer->DrawSolidRectGauge(buildingObj[i]->getX(), buildingObj[i]->getY() + 60, 0,
 				100, 5, 0, 0, 1, 1, buildingObj[i]->getLife() / 500, buildingObj[i]->getLevel());
-			renderer->DrawText(buildingObj[i]->getX() - 40, buildingObj[i]->getY() - 70, GLUT_BITMAP_9_BY_15, 1, 1, 1, "BUILDING");
+			renderer->DrawText(buildingObj[i]->getX() - 30, buildingObj[i]->getY() - 70, GLUT_BITMAP_9_BY_15, 1, 1, 1, "BUILDING");
 		}
 	}
 
@@ -137,7 +139,7 @@ void SceneMgr::AddBuildingObj()
 	buildingObj[4] = new GameObject(0, -250, OBJECT_BUILDING, TEAM2);
 	buildingObj[5] = new GameObject(150, -250, OBJECT_BUILDING, TEAM2);
 
-	sound->PlaySound(soundBG, true, 0.2f);
+	sound->StartSound(soundBG, true, 0.2f);
 }
 
 int SceneMgr::AddObj(float x, float y, int type, int team)
@@ -183,7 +185,7 @@ void SceneMgr::UpdateObj(float elapsedTime)
 
 		runtime = 0.f;
 	}
-	if (effecttime == 1.0f)
+	if (effecttime >= 1.0f)
 		effecttime = 0.f;
 
 	srand((unsigned int)time(NULL));
@@ -297,6 +299,8 @@ void SceneMgr::Collision()
 						if (CollisionRect(minX, minY, maxX, maxY, minX1, minY1, maxX1, maxY1)) {
 							buildingObj[j]->SetDamage(actorObj[i]->getLife());
 							actorObj[i]->SetLife(0.f);
+
+							ExplosionSound();
 						}
 					}
 				}
@@ -327,6 +331,8 @@ void SceneMgr::Collision()
 						if (CollisionRect(minX, minY, maxX, maxY, minX1, minY1, maxX1, maxY1)) {
 							buildingObj[j]->SetDamage(actorObj[i]->getLife());
 							actorObj[i]->SetLife(0.f);
+
+							ExplosionSound();
 						}
 					}
 				}
@@ -358,6 +364,8 @@ void SceneMgr::Collision()
 							if (actorObj[i]->getType() == OBJECT_CHARACTER) {
 								actorObj[i]->SetDamage(bulletObj[j]->getLife());
 								bulletObj[j]->SetDamage(actorObj[i]->getLife());
+
+								ExplosionSound();
 							}
 						}
 					}
@@ -389,6 +397,8 @@ void SceneMgr::Collision()
 						if (CollisionRect(minX, minY, maxX, maxY, minX1, minY1, maxX1, maxY1)) {
 							buildingObj[i]->SetDamage(bulletObj[j]->getLife());
 							bulletObj[j]->SetLife(0.f);
+
+							ExplosionSound();
 						}
 					}
 				}
@@ -420,6 +430,8 @@ void SceneMgr::Collision()
 							if ((actorObj[i]->getType() == OBJECT_CHARACTER) && (actorObj[j]->getType() == OBJECT_ARROW)) {
 								actorObj[i]->SetDamage(actorObj[j]->getLife());
 								actorObj[j]->SetLife(0.f);
+
+								ExplosionSound();
 							}
 						}
 					}
@@ -452,6 +464,8 @@ void SceneMgr::Collision()
 							if ((actorObj[i]->getType() == OBJECT_CHARACTER) && (actorObj[j]->getType() == OBJECT_ARROW)) {
 								actorObj[i]->SetDamage(actorObj[j]->getLife());
 								actorObj[j]->SetLife(0.f);
+
+								ExplosionSound();
 							}
 						}
 					}

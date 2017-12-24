@@ -24,9 +24,9 @@ private:
 
 	Sound* sound;
 
-	float team1time, team2time, runtime, effecttime, climatetime;
+	float team1time, team2time, runtime, effecttime, climatetime, soundtime;
 	int rabbitX, DogX, DogY;
-	int soundBG;
+	int soundBG, soundEX, soundAPP;
 
 public:
 	SceneMgr();
@@ -43,5 +43,8 @@ public:
 	bool CollisionRect(float minX, float minY, float maxX, float maxY, float minX1, float minY1, float maxX1, float maxY1);
 
 	float getTeam2Time() { return team2time; }
+
+	void ExplosionSound() { sound->StartSound(soundEX, false, 0.2f); }
+	void AppearanceSound() { sound->StartSound(soundAPP, false, 0.2f); }
 };
 

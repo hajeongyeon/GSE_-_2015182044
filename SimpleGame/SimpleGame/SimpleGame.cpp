@@ -42,8 +42,10 @@ void MouseInput(int button, int state, int x, int y)
 	{
 		if (g_LButtonDown)
 		{
-			if (-y + 350 < 0 && mgr->getTeam2Time() >= 7.f)
+			if (-y + 350 < 0 && mgr->getTeam2Time() >= 7.f) {
 				mgr->AddObj(x - 250, -y + 350, OBJECT_CHARACTER, TEAM2);
+				mgr->AppearanceSound();
+			}
 		}
 		g_LButtonDown = false;
 	}
